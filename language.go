@@ -1317,21 +1317,6 @@ type FoldingRange struct {
 	Kind FoldingRangeKind `json:"kind,omitempty"`
 }
 
-// InlayHintOptions InlayHint Registration options.
-//
-// @since 3.17.0
-type InlayHintOptions struct {
-	// The server provides support to resolve additional information for an inlay hint item.
-	ResolveProvider bool `json:"resolveProvider,omitempty"`
-}
-
-// InlayHintRegistrationOptions CompletionRegistration options.
-type InlayHintRegistrationOptions struct {
-	InlayHintOptions
-	TextDocumentRegistrationOptions
-	StaticRegistrationOptions
-}
-
 // InlayHintParams params of InlayHint request.
 //
 // @since 3.17.0

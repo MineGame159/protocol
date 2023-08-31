@@ -122,6 +122,11 @@ type ServerCapabilities struct {
 	// @since 3.16.0.
 	MonikerProvider interface{} `json:"monikerProvider,omitempty"` // TODO(zchee): bool | *MonikerOptions | *MonikerRegistrationOptions
 
+	// InlayHintProvider is the server provides inlay hint support.
+	//
+	// @since 3.17.0
+	InlayHintProvider interface{} `json:"inlayHintProvider,omitempty"` // bool |*InlayHintOptions | *InlayHintRegistrationOptions
+
 	// Experimental server capabilities.
 	Experimental interface{} `json:"experimental,omitempty"`
 }
@@ -520,4 +525,19 @@ type MonikerOptions struct {
 type MonikerRegistrationOptions struct {
 	TextDocumentRegistrationOptions
 	MonikerOptions
+}
+
+// InlayHintOptions InlayHint Registration options.
+//
+// @since 3.17.0
+type InlayHintOptions struct {
+	// The server provides support to resolve additional information for an inlay hint item.
+	ResolveProvider bool `json:"resolveProvider,omitempty"`
+}
+
+// InlayHintRegistrationOptions CompletionRegistration options.
+type InlayHintRegistrationOptions struct {
+	InlayHintOptions
+	TextDocumentRegistrationOptions
+	StaticRegistrationOptions
 }
