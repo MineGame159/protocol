@@ -1,4 +1,4 @@
-module go.lsp.dev/protocol
+module github.com/MineGame159/protocol
 
 go 1.17
 
