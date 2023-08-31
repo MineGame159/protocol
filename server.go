@@ -25,6 +25,7 @@ func ServerDispatcher(conn jsonrpc2.Conn, logger *zap.Logger) Server {
 }
 
 // ServerHandler jsonrpc2.Handler of Language Server Prococol Server.
+//
 //nolint:unparam
 func ServerHandler(server Server, handler jsonrpc2.Handler) jsonrpc2.Handler {
 	h := func(ctx context.Context, reply jsonrpc2.Replier, req jsonrpc2.Request) error {
@@ -55,6 +56,7 @@ func ServerHandler(server Server, handler jsonrpc2.Handler) jsonrpc2.Handler {
 }
 
 // serverDispatch implements jsonrpc2.Handler.
+//
 //nolint:gocognit,funlen,gocyclo,cyclop
 func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, req jsonrpc2.Request) (handled bool, err error) {
 	if ctx.Err() != nil {
@@ -769,6 +771,18 @@ func serverDispatch(ctx context.Context, server Server, reply jsonrpc2.Replier, 
 
 		return true, reply(ctx, resp, err)
 
+	case MethodInlayHint: // request
+		defer logger.Debug(MethodInlayHint, zap.Error(err))
+
+		var params InlayHintParams
+		if err := dec.Decode(&params); err != nil {
+			return true, replyParseError(ctx, reply, err)
+		}
+
+		resp, err := server.InlayHint(ctx, &params)
+
+		return true, reply(ctx, resp, err)
+
 	default:
 		return false, nil
 	}
@@ -835,6 +849,7 @@ type Server interface {
 	SemanticTokensRefresh(ctx context.Context) (err error)
 	LinkedEditingRange(ctx context.Context, params *LinkedEditingRangeParams) (result *LinkedEditingRanges, err error)
 	Moniker(ctx context.Context, params *MonikerParams) (result []Moniker, err error)
+	InlayHint(ctx context.Context, params *InlayHintParams) (result []InlayHint, err error)
 	Request(ctx context.Context, method string, params interface{}) (result interface{}, err error)
 }
 
@@ -1019,6 +1034,9 @@ const (
 
 	// MethodMoniker method name of "textDocument/moniker".
 	MethodMoniker = "textDocument/moniker"
+
+	// MethodInlayHint method name of "textDocument/inlayHint"
+	MethodInlayHint = "textDocument/inlayHint"
 )
 
 // server implements a Language Server Protocol server.
@@ -1171,7 +1189,7 @@ func (s *server) CodeLensResolve(ctx context.Context, params *CodeLens) (_ *Code
 
 // ColorPresentation sends the request from the client to the server to obtain a list of presentations for a color value at a given location.
 //
-// Clients can use the result to
+// # Clients can use the result to
 //
 // - modify a color reference.
 // - show in a color picker and let users pick one of the presentations.
@@ -1872,6 +1890,17 @@ func (s *server) Moniker(ctx context.Context, params *MonikerParams) (result []M
 	defer s.logger.Debug("end "+MethodMoniker, zap.Error(err))
 
 	if err := Call(ctx, s.Conn, MethodMoniker, params, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (s *server) InlayHint(ctx context.Context, params *InlayHintParams) (result []InlayHint, err error) {
+	s.logger.Debug("call " + MethodInlayHint)
+	defer s.logger.Debug("end "+MethodInlayHint, zap.Error(err))
+
+	if err := Call(ctx, s.Conn, MethodInlayHint, params, &result); err != nil {
 		return nil, err
 	}
 

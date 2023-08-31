@@ -1021,13 +1021,20 @@ type GeneralClientCapabilities struct {
 //
 // The following features from the ECMAScript 2020 regular expression specification are NOT mandatory for a client:
 //
-//  Assertions
+//	Assertions
+//
 // Lookahead assertion, Negative lookahead assertion, lookbehind assertion, negative lookbehind assertion.
-//  Character classes
+//
+//	Character classes
+//
 // Matching control characters using caret notation (e.g. "\cX") and matching UTF-16 code units (e.g. "\uhhhh").
-//  Group and ranges
+//
+//	Group and ranges
+//
 // Named capturing groups.
-//  Unicode property escapes
+//
+//	Unicode property escapes
+//
 // None of the features needs to be supported.
 //
 // The only regular expression flag that a client needs to support is "i" to specify a case insensitive search.
@@ -1058,4 +1065,23 @@ type MarkdownClientCapabilities struct {
 
 	// version is the version of the parser.
 	Version string `json:"version,omitempty"`
+}
+
+// InlayHintClientCapabilities represents a client capabilities specific to inlay hints.
+//
+// @since 3.17.0
+type InlayHintClientCapabilities struct {
+	// Whether inlay hints support dynamic registration.
+	DynamicRegistration bool `json:"dynamicRegistration,omitempty"`
+
+	// Indicates which properties a client can resolve lazily on an inlay hint.
+	ResolveSupport *InlayHintClientCapabilitiesResolveSupport `json:"resolveSupport,omitempty"`
+}
+
+// InlayHintClientCapabilitiesResolveSupport specific capabilities for the ResolveSupport in the InlayHintClientCapabilities
+//
+// @since 3.17.0
+type InlayHintClientCapabilitiesResolveSupport struct {
+	// The properties that a client can resolve lazily.
+	Properties []string `json:"properties"`
 }
